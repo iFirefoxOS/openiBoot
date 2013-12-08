@@ -21,6 +21,12 @@ int arm_setup() {
 	InvalidateCPUDataCache();
 	ClearCPUInstructionCache();
 
+	/* Set L2en. */
+#ifdef ARM_A8
+	WriteAuxiliaryControlRegister(ReadAuxiliaryControlRegister() | ARM_A8_AuxControl_L2EN);
+	WriteControlRegisterConfigData(ReadAuxiliaryControlRegister() | (1 << 11));	/* SCTLR.Z-bit */
+#endif
+
 	WriteControlRegisterConfigData(ReadControlRegisterConfigData() | ARM11_Control_INSTRUCTIONCACHE);	// Enable instruction cache
 	WriteControlRegisterConfigData(ReadControlRegisterConfigData() | ARM11_Control_DATACACHE);		// Enable data cache
 

@@ -7,6 +7,13 @@ env.Append(CPPDEFINES = ['CONFIG_ARM'])
 arch_arm_src = env.Localize([
 	'entry.sx',
 	'asmhelpers.sx',
+	'bcopy.sx',
+	'bzero.sx',
+	'strchr.sx',
+	'strcmp.sx',
+	'strlen.sx',
+	'strncmp.sx',
+	'memcmp.sx',
 	'arm.c',
 	])
 Export('arch_arm_src')

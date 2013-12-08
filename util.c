@@ -59,53 +59,6 @@ void system_panic(const char* format, ...) {
 	panic();
 }
 
-void* memset(void* x, int fill, uint32_t size) {
-	uint32_t i;
-	for(i = 0; i < size; i++) {
-		((uint8_t*)x)[i] = (uint8_t) fill;
-	}
-	return x;
-}
-
-void* memcpy(void* dest, const void* src, uint32_t size) {
-	uint32_t i;
-	for(i = 0; i < size; i++) {
-		((uint8_t*)dest)[i] = ((uint8_t*)src)[i];
-	}
-	return dest;
-}
-
-int strcmp(const char* s1, const char* s2) {
-	while(*s1 == *(s2++)) {
-		if(*(s1++) == '\0')
-			return 0;
-	}
-
-	return (*(const unsigned char *)s1 - *(const unsigned char *)(s2 - 1));
-}
-
-int strncmp(const char* s1, const char* s2, size_t n) {
-	while(n-- > 0 && *s1 == *(s2++)) {
-		if(n == 0 || *(s1++) == '\0')
-			return 0;
-	}
-
-	return (*(const unsigned char *)s1 - *(const unsigned char *)(s2 - 1));
-}
-
-char* strchr(const char* s1, int s2)
-{
-	while(*s1)
-	{
-		if(*s1 == s2)
-			return ((char*) s1);
-
-		++s1;
-	}
-
-	return NULL;
-}
-
 char* strstr(const char* s1, const char* s2)
 {
 	while(*s1)
@@ -148,51 +101,6 @@ char* strcpy(char* dst, const char* src) {
 	*dst = '\0';
 	
 	return origDest;
-}
-
-int memcmp(const void* s1, const void* s2, uint32_t size) {
-	uint32_t i;
-	const uint8_t* a = s1;
-	const uint8_t* b = s2;
-	for(i = 0; i < size; i++) {
-		if(a[i] == b[i])
-			continue;
-
-		if(a[i] < b[i])
-			return -1;
-
-		if(a[i] > b[i])
-			return 1;
-	}
-
-	return 0;
-
-}
-
-void* memmove(void *dest, const void* src, size_t length)
-{
-	register uint8_t* myDest = dest;
-	const register uint8_t* mySrc = src;
-	if (mySrc < myDest)
-		/* Moving from low mem to hi mem; start at end.  */
-		for(src += length, myDest += length; length; --length)
-			*--myDest = *--mySrc;
-	else if (src != myDest)
-	{
-		/* Moving from hi mem to low mem; start at beginning.  */
-		for (; length; --length)
-			*myDest++ = *mySrc++;
-	}
-	return dest;
-}
-
-size_t strlen(const char* str) {
-	int ret = 0;
-	while(*str != '\0') {
-		++str;
-		++ret;
-	}
-	return ret;
 }
 
 int tolower(int c) {

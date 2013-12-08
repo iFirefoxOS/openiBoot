@@ -39,6 +39,7 @@ void OpenIBootConsole()
 					"      |_|                                       \r\n"
 					"\r\n"
 					"version: %s\r\n", OPENIBOOT_VERSION_STR);
+
 	DebugPrintf("                    DEBUG MODE\r\n");
 }
 

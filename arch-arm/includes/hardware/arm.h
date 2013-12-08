@@ -109,6 +109,7 @@
 #define ARM11_PeripheralPortSize2GB 21
 
 #define ARM_A8_AuxControl_SPECULATIVEACCESSAXI 0x8
+#define ARM_A8_AuxControl_L2EN (1 << 1)
 
 #endif
 

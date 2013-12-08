@@ -3241,7 +3241,7 @@ void h2fmi_init()
 
 	free(buff1);
 }
-MODULE_INIT(h2fmi_init);
+//MODULE_INIT(h2fmi_init);
 
 static error_t cmd_nand_read(int argc, char** argv)
 {
