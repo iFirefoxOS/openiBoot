@@ -46,7 +46,9 @@
 #endif
 
 #ifndef INITRD_LOAD
-#ifdef CONFIG_S5L8720
+#ifdef CONFIG_S5L8900
+#define INITRD_LOAD (RAMStart + 0x06000000)
+#elif CONFIG_S5L8720
 #define INITRD_LOAD (RAMStart + 0x07000000)
 #else
 #define INITRD_LOAD (RAMStart + 0x08000000)
@@ -456,7 +458,6 @@ static error_t load_multitouch_images()
 void boot_linux(const char* args, uint32_t mach_type) {
 	uint32_t exec_at = (uint32_t) kernel;
 	uint32_t param_at = exec_at - 0x2000;
-	int i;
 
 	if(exec_at > RAMStart)
 		exec_at = (exec_at - RAMStart) + MemoryStart;
@@ -481,6 +482,7 @@ void boot_linux(const char* args, uint32_t mach_type) {
 		}
 	}
 
+	int i;
 	for(i = 0; i < (0x1000/sizeof(uint32_t)); i++) {
 		((uint32_t*)0x100)[i] = ((uint32_t*)param_at)[i];
 	}
