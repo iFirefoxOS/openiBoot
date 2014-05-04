@@ -57,7 +57,7 @@ void iboot_loader_run(void) {
 			load_iboot();
 			task_stop();
 		}
-		if (gpio_pin_state(BUTTONS_HOLD) && buttonPressed == FALSE) {
+		if (gpio_pin_state(BUTTONS_HOME) && buttonPressed == FALSE) {
 			buttonPressed = TRUE;
 			bufferPrintf("Automatic booting cancelled\r\n");
 		}
@@ -66,7 +66,7 @@ void iboot_loader_run(void) {
 			bufferPrintf("===================\r\n");
 			bufferPrintf("Welcome to the 2g touch experimental openiBoot!\r\n");
 			bufferPrintf("iBoot will be automatically loaded after 10 seconds\r\n");
-			bufferPrintf("Press the power button to cancel automatic booting\r\n");
+			bufferPrintf("Press the home button to cancel automatic booting\r\n");
 			bufferPrintf("Press the volume up button to load ios\r\n");
 			bufferPrintf("===================\r\n");
 			bufferPrintf("\r\n\r\n\r\n");

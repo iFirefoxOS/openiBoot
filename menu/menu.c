@@ -26,13 +26,6 @@
 #include "framebuffer.h"
 #include "buttons.h"
 #include "timer.h"
-/*#include "images/ConsolePNG.h"
-#include "images/iPhoneOSPNG.h"
-#include "images/AndroidOSPNG.h"
-#include "images/ConsoleSelectedPNG.h"
-#include "images/iPhoneOSSelectedPNG.h"
-#include "images/AndroidOSSelectedPNG.h"
-#include "images/HeaderPNG.h"*/
 #include "images.h"
 #include "actions.h"
 #include "stb_image.h"
@@ -88,17 +81,16 @@ void menu_draw()
  *
  * Checks for button presses and executes the appropriate task.
  *
- * @param _V nickp666 does not yet know why this is here.
+ * @param _V unused, needed to able to use this function as task.
  */
 static void menu_run(uint32_t _V)
 {
 	while(TRUE)
 	{
 #ifdef BUTTONS_VOLDOWN
-		if(buttons_is_pushed(BUTTONS_HOLD)
-				|| !buttons_is_pushed(BUTTONS_VOLDOWN))
+		if(!buttons_is_pushed(BUTTONS_VOLDOWN))
 #else
-		if(buttons_is_pushed(BUTTONS_HOLD))
+		if(buttons_is_pushed(BUTTONS_HOME))
 #endif
 		{
 			setup_entry(setup_current()->list_ptr.next);
@@ -119,7 +111,7 @@ static void menu_run(uint32_t _V)
 		}
 #endif
 
-		if(buttons_is_pushed(BUTTONS_HOME))
+		if(buttons_is_pushed(BUTTONS_POWER))
 		{
 			framebuffer_setdisplaytext(TRUE);
 			framebuffer_clear();
@@ -146,11 +138,9 @@ static void menu_run(uint32_t _V)
  */
 void menu_main()
 {
-	task_init(&menu_task, "menu", TASK_DEFAULT_STACK_SIZE);
-
 	init_modules();
 
-	if(script_run_file("(0)/boot/menu.lst"))
+	if(script_run_file("(hd0,0)/boot/menu.lst"))
 	{
 		bufferPrintf("menu.lst NOT FOUND - Switching to console...\n");
 		OpenIBootConsole();
@@ -176,6 +166,7 @@ void menu_main()
 
 	menu_draw();
 
+	task_init(&menu_task, "menu", TASK_DEFAULT_STACK_SIZE);
 	task_start(&menu_task, &menu_run, NULL);
 }
 
