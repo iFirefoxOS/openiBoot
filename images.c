@@ -979,7 +979,7 @@ static error_t cmd_images_install(int argc, char** argv)
 	uint32_t address = parseNumber(argv[2]);
 	uint32_t len = parseNumber(argv[3]);
 
-	bufferPrintf("Installing image %s to 0x%08x:%d.\n", argv[1], address, len);
+	bufferPrintf("Installing image %s from 0x%08x:%d.\n", argv[1], address, len);
 	images_install((void*)address, len, tag, tag);
 	bufferPrintf("Done.\r\n");
 
@@ -989,7 +989,7 @@ COMMAND("images_install", "install a boot image", cmd_images_install);
 
 static error_t cmd_images_uninstall(int argc, char** argv)
 {
-	if(argc < 4) {
+	if(argc < 2) {
 		bufferPrintf("Usage: %s <tag>\r\n", argv[0]);
 		return EINVAL;
 	}
