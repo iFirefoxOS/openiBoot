@@ -22,5 +22,5 @@ env.SConscript([
 	'#plat-s5l8720/SConscript',
 	'#plat-s5l8900/SConscript',
 	'#plat-s5l8920/SConscript',
-	'#plat-a4/SConscript',
+	'#plat-s5pc110a01/SConscript',
 	], 'env')
