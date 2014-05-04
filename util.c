@@ -224,106 +224,89 @@ void bytesToHex(const uint8_t* buffer, int bytes) {
 
 char** tokenize(char* commandline, int* argc)
 {
-	char *read = commandline, *write = commandline;
-	char** arguments = NULL;
-	int args = 0; // Args processed so far
-	int alloced = 0; // Space in array
-	int inQuote = FALSE; // ""
-	int inArg = FALSE;
-	int forceArg = FALSE;
+	*argc = 0;
 
-	while(*read)
+	int i;
+	char inQuote = 0;
+	char inSlah = 0;
+	
+	char** argv = NULL;
+	
+	char* arg = NULL;
+	for(i = 0; commandline[i]; ++i)
 	{
-		if(*read == '"')
+		if (commandline[i] == '"')
 		{
-			read++;
-
-			if(!inQuote)
-			{
-				inQuote = TRUE;
-				forceArg = TRUE;
-			}
-			else
-			{
-				inQuote = FALSE;
-				continue;
-			}
+			inQuote = !inQuote;
+			continue;
 		}
-		else if(*read == '\\')
+		
+		if (!inQuote && (commandline[i] == ' ' || commandline[i] == '\t' || commandline[i] == '\r' || commandline[i] == '\n'))
 		{
-			read++;
-			if(*read)
+			if (arg != NULL)
 			{
-				switch(*read)
-				{
+				argv = realloc(argv, (*argc + 1) * sizeof(char*));
+			
+				argv[*argc] = arg;
+				arg = NULL;
+			
+				++*argc;
+			}
+			continue;
+		}
+		
+		if (!inSlah && commandline[i] == '\\')
+		{
+			inSlah = 1;
+			continue;
+		}
+		
+		int pos = 0;
+		
+		if (arg)
+			pos = strlen(arg);
+			
+		arg = realloc(arg, (pos + 2) * sizeof(char));
+		
+		if(inSlah)
+		{
+			switch(commandline[i])
+			{
+				case '\\':
+					arg[pos] = '\\';
+					break;
+					
 				case 'n':
-					*write = '\n';
+					arg[pos] = '\n';
 					break;
 
 				case 'r':
-					*write = '\r';
+					arg[pos] = '\r';
 					break;
 
 				case '0':
-					*write = 0;
+					arg[pos] = 0;
 					break;
-
-				default:
-					if(read != write)
-						*write = *read;
-					break;
-				}
-
-				write++;
-				read++;
-				continue;
 			}
+			inSlah = 0;
 		}
-		else if(!inQuote &&
-				(*read == ' '
-				 || *read == '\t'
-				 || *read == '\r'
-				 || *read == '\n'))
-		{
-			if(inArg)
-			{
-				*write = 0;
-				write++;
-
-				inArg = FALSE;
-			}
-
-			read++;
-			continue;
-		}
-
-		if(!inArg)
-		{
-			if(args >= alloced)
-			{
-				alloced += 10;
-				arguments = realloc(arguments, sizeof(char*)*alloced);
-			}
-
-			arguments[args] = write;
-			args++;
-
-			inArg = TRUE;
-		}
-
-		if(!forceArg)
-		{
-			if(read != write)
-				*write = *read;
-
-			read++;
-			write++;
-		}
-		else forceArg = FALSE;
+		else
+			arg[pos] = commandline[i];
+		
+		arg[pos + 1] = 0;
 	}
-
-	*argc = args;
-	return arguments;
+	
+	if (arg != NULL)
+	{
+		argv = realloc(argv, (*argc + 1) * sizeof(char*));
+	
+		argv[*argc] = arg;
+		arg = NULL;
+	
+		++*argc;
+	}
+	
+	return argv;
 }
 
 void dump_memory(uint32_t start, int length) {
