@@ -18,7 +18,6 @@ Import('*')
 
 henv = Environment()
 Export('henv')
-henv.SConscript(['scons/Doxygen.SConscript'])
 
 env = ARMEnvironment()
 env.Append(CPPDEFINES=[
@@ -31,10 +30,6 @@ Export('env')
 def localize(env, ls):
 	return [File(f) for f in ls]
 env.AddMethod(localize, "Localize")
-
-# Documentation
-docs = henv.Doxygen("Doxyfile")
-Alias("docs", docs)
 
 # Base Target Sources
 base_src = env.Localize([
