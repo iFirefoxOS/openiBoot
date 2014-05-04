@@ -96,8 +96,10 @@ typedef struct AppleImg3RootHeader {
 }__attribute__((__packed__)) AppleImg3RootHeader;
 
 typedef struct AppleImg3KBAGHeader {
-  uint32_t key_modifier;		// key modifier, can be 0 or 1 	
-  uint32_t key_bits;			// number of bits in the key, can be 128, 192 or 256 (it seems only 128 is supported in current iBoot)
+  uint32_t key_modifier;		// key modifier, can be 0 or 1 or sometims 2 - 2 is not supported yet.
+  uint32_t key_bits;			// number of bits in the key, can be 128, 192 or 256
+  uint8_t iv[16];
+  uint8_t key[32];
 } AppleImg3KBAGHeader;
 
 typedef struct Image {

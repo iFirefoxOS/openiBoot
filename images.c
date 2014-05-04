@@ -378,8 +378,8 @@ void images_from_template(Image* image, uint32_t type, int index, void* dataBuff
 
 	uint32_t offset = MaxOffset + (SegmentSize - (MaxOffset % SegmentSize));
 	uint32_t padded = len;
-	if((len & 0xF) != 0) {
-		padded = (padded & ~0xF) + 0x10;
+	if((len & ~15) != 0) {
+		padded = (padded & ~15) + 0x10;
 	}
 
 	uint32_t totalLen = sizeof(Img2Header) + padded;
@@ -429,8 +429,8 @@ void images_write(Image* image, void* data, unsigned int length, int encrypt) {
 	mtd_prepare(dev);
 
 	uint32_t padded = length;
-	if((length & 0xF) != 0) {
-		padded = (padded & ~0xF) + 0x10;
+	if((length & ~15) != 0) {
+		padded = (padded & ~15) + 16;
 	}
 
 	if(image->next != NULL && (image->offset + sizeof(Img2Header) + padded) >= image->next->offset) {
@@ -521,7 +521,7 @@ unsigned int images_read(Image* image, void** data) {
 
 		if(kbag != 0) {
 			if(kbag->key_modifier == 1) {
-				aes_decrypt((void*)(kbagOffset + sizeof(AppleImg3KBAGHeader)), 16 + (kbag->key_bits / 8), AESGID, NULL, 0, NULL);
+				aes_decrypt(kbag->iv, 16 + (kbag->key_bits / 8), AESGID, NULL, 0, NULL); //len of iv is 16 + len of key is bits of key / 8
 			}
 
 			AESKeyLen keyLen;
@@ -541,7 +541,7 @@ unsigned int images_read(Image* image, void** data) {
 					break;
 			}
 
-			aes_decrypt((void*)dataOffset, (dataLength / 16) * 16, AESCustom, (uint8_t*)(kbagOffset + sizeof(AppleImg3KBAGHeader) + 16), keyLen, (uint8_t*)(kbagOffset + sizeof(AppleImg3KBAGHeader)));
+			aes_decrypt((void*)dataOffset, dataLength & ~15, AESCustom, kbag->key, keyLen, kbag->iv);
 		}
 
 		uint8_t* newBuf = malloc(dataLength);
@@ -816,7 +816,7 @@ void* images_inject_img3(const void* img3Data, const void* newData, size_t newDa
 	AppleImg3KBAGHeader* kbag = (AppleImg3KBAGHeader*) kbagOffset;
 
 	if(kbag != 0 && kbag->key_modifier == 1) {
-		memcpy(IVKey, (void*)(kbagOffset + sizeof(AppleImg3KBAGHeader)), 16 + (kbag->key_bits / 8));
+		memcpy(IVKey, kbag->iv, 16 + (kbag->key_bits / 8));
 		aes_decrypt(IVKey, 16 + (kbag->key_bits / 8), AESGID, NULL, 0, NULL);
 	}
 
@@ -843,7 +843,7 @@ void* images_inject_img3(const void* img3Data, const void* newData, size_t newDa
 
 			memcpy(cursor + sizeof(AppleImg3Header), newData, newDataLen);
       if(kbag != 0) {
-  			aes_encrypt(cursor + sizeof(AppleImg3Header), (newDataLen / 16) * 16, AESCustom, Key, AES256, IV);
+  			aes_encrypt(cursor + sizeof(AppleImg3Header), newDataLen & ~15, AESCustom, Key, AES256, IV);
       }
 			cursor += newHeader->size;
 		} else {
